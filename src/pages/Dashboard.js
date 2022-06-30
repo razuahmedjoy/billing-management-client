@@ -1,8 +1,61 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import BillingForm from '../components/BillingForm';
+import BillingsTable from '../components/BillingsTable';
+import Loader from '../components/Loader';
+import useBillings from '../hooks/useBillings';
+import axios from 'axios';
+import { toast } from 'react-toastify'
+import { billingContext } from '../components/Layout';
 
 const Dashboard = () => {
 
-    
+    const [selectedBill, setSelectedBill] = useState({});
+    // const { billings, setBillings, loading, refetch } = useBillings()
+    const { allBillings, billings, setBillings, loading, refetch, page, setPage, totalPage } = useContext(billingContext)
+
+    useEffect(() => {
+       
+        const getBillings = async () => {
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/billing-list?page=${page}`);
+            const { data } = res;
+            // console.log(data)
+            setBillings(data);
+
+            
+        }
+        getBillings();
+
+    }, [page])
+
+    const handleDelete = async () => {
+
+        const updating = toast.loading("Deleting..");
+
+        const url = `${process.env.REACT_APP_API_URL}/delete-billing/${selectedBill._id}`;
+        // console.log(url)
+
+        const res = await axios.delete(url);
+        // console.log(res);
+        if (res.data.deletedCount) {
+            setSelectedBill(null);
+            refetch();
+            toast.update(updating, {
+                render: "Deleted", type: "success", isLoading: false, autoClose: 3000,
+                hideProgressBar: false
+            })
+        }
+
+    }
+
+    const handleSearch = (e) => {
+        const txt = e.target.value;
+        if (txt) {
+            const newBillings = allBillings.filter(bill => bill.fullName.includes(txt) || bill.email.includes(txt) || bill.phone.includes(txt));
+            setBillings(newBillings);
+        } else {
+            refetch()
+        }
+    }
 
     return (
         <div className="">
@@ -10,75 +63,74 @@ const Dashboard = () => {
                 <div>
                     <div className="flex items-center gap-x-4">
                         <h4 className="font-semibold">Billing</h4>
-                        <input type="text" className="py-1 px-4 border border-gray-300 rounded-none max-w-sm focus:outline-none" placeholder="Search" />
+                        <input onChange={handleSearch} type="text" className="py-1 px-4 border border-gray-300 rounded-none w-full focus:outline-none" placeholder="Search by full name/email/phone" />
                     </div>
                 </div>
 
-                <button className="btn btn-sm">
+                <label onClick={() => setSelectedBill("")} htmlFor="my-modal-4" className="btn btn-sm">
                     Add New Bill
-                </button>
+                </label>
             </div>
 
 
-            <div className="billing-table">
-                <div class="overflow-x-auto">
-                    <table class="table table-zebra w-full">
-                     
-                        <thead>
-                            <tr>
-                                <th>Billing Id</th>
-                                <th>Full Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Paid Amount</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                          
-                            <tr>
-                                <th className="border border-gray-300">123456798</th>
-                                <td>Cy Ganderton</td>
-                                <td>email@gmail.com</td>
-                                <td>01215645656</td>
-                                <td>450</td>
-                                <td className="flex gap-x-4">
-                                    <button className="btn btn-xs">Edit</button>
-                                    <button className="btn btn-xs">Delete</button>
-                                </td>
-                            </tr>
-                         
-                          
-                            <tr>
-                                <th className="border border-gray-300">123456798</th>
-                                <td>Cy Ganderton</td>
-                                <td>email@gmail.com</td>
-                                <td>01215645656</td>
-                                <td>450</td>
-                                <td className="flex gap-x-4">
-                                    <button className="btn btn-xs">Edit</button>
-                                    <button className="btn btn-xs">Delete</button>
-                                </td>
-                            </tr>
-                         
-                          
-                            <tr>
-                                <th className="border border-gray-300">123456798</th>
-                                <td>Cy Ganderton</td>
-                                <td>email@gmail.com</td>
-                                <td>01215645656</td>
-                                <td>450</td>
-                                <td className="flex gap-x-4">
-                                    <button className="btn btn-xs">Edit</button>
-                                    <button className="btn btn-xs">Delete</button>
-                                </td>
-                            </tr>
-                         
-                        </tbody>
-                    </table>
+            <div className="billing-table pb-8">
+
+                <BillingsTable billings={billings} setSelectedBill={setSelectedBill} />
+
+            </div>
+            <div className="pagination pb-10">
+                <div className="flex gap-2 justify-center">
+                    <button onClick={() => setPage(page-1)} className={`btn  rounded-none px-3 btn-xs ${page == 0 && 'btn-disabled'}`}> {`<`} </button>
+                    {
+                        [...Array(totalPage).keys()].map(x =>
+
+                            <span className={`btn-xs rounded-none btn ${page === x && 'bg-secondary text-white'}`} onClick={() => setPage(x)}>{x + 1}</span>
+
+                        )
+                    }
+                    <button onClick={() => setPage(page+1)} className={`btn  rounded-none px-3 btn-xs ${page+1 == totalPage && 'btn-disabled'}`}> {`>`} </button>
                 </div>
             </div>
-        </div>
+
+
+
+            {
+                selectedBill !== null &&
+
+                <div>
+                    <input type="checkbox" id="my-modal-4" className="modal-toggle" />
+                    <label htmlFor="my-modal-4" className="modal cursor-pointer">
+                        <label className="modal-box relative" htmlFor="">
+                            <BillingForm
+                                billings={billings}
+                                setBillings={setBillings}
+                                refetch={refetch}
+                                bill={selectedBill}
+                                setBill={setSelectedBill} />
+
+                        </label>
+                    </label>
+                </div>
+            }
+            {
+                selectedBill !== null &&
+
+                <>
+
+                    <input type="checkbox" id="delete-modal" className="modal-toggle" />
+                    <label htmlFor="delete-modal" className="modal cursor-pointer">
+                        <label className="modal-box relative" htmlFor="">
+                            <h3 className="text-lg my-4 text-red-600">Are You sure Want to delete it?</h3>
+                            <button className="btn-danger btn btn-sm" onClick={handleDelete}>Yes</button>
+                        </label>
+                    </label>
+                </>
+
+
+            }
+
+
+        </div >
     );
 };
 

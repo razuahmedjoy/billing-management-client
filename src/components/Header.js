@@ -1,8 +1,15 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {NavLink} from 'react-router-dom';
+import useBillings from '../hooks/useBillings';
+import { billingContext } from './Layout';
 
 const Header = () => {
+    const {allBillings,billings, setBillings, loading, refetch } = useContext(billingContext)
 
+
+    const getTotal = (prev,current) => {
+        return prev + parseInt(current.amount)
+    }
  
     return (
         <>
@@ -13,7 +20,11 @@ const Header = () => {
                 <div className="navigation">
                     <ul className="flex gap-x-8 md:text-md lg:text-lg font-poppin">
                         <li>
-                           <button className="py-1 px-3 rounded-full bg-primary text-white">Paid Total : 200</button>
+                           <button className="py-1 px-3 rounded-full bg-primary text-white">Paid Total : 
+                           {
+                            allBillings.reduce(getTotal,0)
+                           }
+                           </button>
 
                         </li>
                  
