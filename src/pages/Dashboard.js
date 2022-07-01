@@ -5,7 +5,7 @@ import Loader from '../components/Loader';
 import useBillings from '../hooks/useBillings';
 import axios from 'axios';
 import { toast } from 'react-toastify'
-import { billingContext } from '../components/Layout';
+import { billingContext, userContext } from '../components/Layout';
 
 const Dashboard = () => {
 
@@ -48,9 +48,9 @@ const Dashboard = () => {
     }
 
     const handleSearch = (e) => {
-        const txt = e.target.value;
+        const txt = e.target.value.toLowerCase();
         if (txt) {
-            const newBillings = allBillings.filter(bill => bill.fullName.includes(txt) || bill.email.includes(txt) || bill.phone.includes(txt));
+            const newBillings = allBillings.filter(bill => bill.fullName.toLowerCase().includes(txt) || bill.email.toLowerCase().includes(txt) || bill.phone.includes(txt));
             setBillings(newBillings);
         } else {
             refetch()
@@ -84,7 +84,7 @@ const Dashboard = () => {
                     {
                         [...Array(totalPage).keys()].map(x =>
 
-                            <span className={`btn-xs rounded-none btn ${page === x && 'bg-secondary text-white'}`} onClick={() => setPage(x)}>{x + 1}</span>
+                            <span key={x} className={`btn-xs rounded-none btn ${page === x && 'bg-secondary text-white'}`} onClick={() => setPage(x)}>{x + 1}</span>
 
                         )
                     }
