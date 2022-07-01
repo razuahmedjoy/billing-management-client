@@ -76,8 +76,14 @@ const Dashboard = () => {
 
 
             <div className="billing-table pb-8">
+                {
+                    loading ? 
+                    <Loader/>
+                    :
+                    <BillingsTable billings={billings} setSelectedBill={setSelectedBill} />
 
-                <BillingsTable billings={billings} setSelectedBill={setSelectedBill} />
+                }
+     
 
             </div>
             <div className="pagination pb-10">
