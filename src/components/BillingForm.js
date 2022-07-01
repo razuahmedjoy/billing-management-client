@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React from 'react';
 import { toast } from 'react-toastify'
-const BillingForm = ({ billings, setBillings, bill, setBill, refetch }) => {
+const BillingForm = ({ billings, setBillings, bill, setBill, refetch ,updateAll}) => {
 
     const handleSubmit = async (e) => {
 
@@ -21,6 +21,7 @@ const BillingForm = ({ billings, setBillings, bill, setBill, refetch }) => {
             // console.log(res);
             if (res.data.modifiedCount) {
                 setBill(null);
+                updateAll();
                 refetch();
 
                 toast.update(updating, {
@@ -47,7 +48,9 @@ const BillingForm = ({ billings, setBillings, bill, setBill, refetch }) => {
 
             if (res.data.inserted.insertedId) {
                 setBill(null);
+                updateAll();
                 refetch();
+
                 toast.update(updating, {
                     render: "Updated", type: "success", isLoading: false, autoClose: 3000,
                     hideProgressBar: false

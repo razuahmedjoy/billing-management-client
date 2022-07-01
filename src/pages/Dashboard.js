@@ -11,7 +11,7 @@ const Dashboard = () => {
 
     const [selectedBill, setSelectedBill] = useState({});
     // const { billings, setBillings, loading, refetch } = useBillings()
-    const { allBillings, billings, setBillings, loading, refetch, page, setPage, totalPage } = useContext(billingContext)
+    const { allBillings, billings, setBillings, loading, refetch, page, setPage, totalPage,updateAll } = useContext(billingContext)
 
     useEffect(() => {
        
@@ -20,6 +20,7 @@ const Dashboard = () => {
             const { data } = res;
             // console.log(data)
             setBillings(data);
+            refetch()
 
             
         }
@@ -39,6 +40,7 @@ const Dashboard = () => {
         if (res.data.deletedCount) {
             setSelectedBill(null);
             refetch();
+            updateAll();
             toast.update(updating, {
                 render: "Deleted", type: "success", isLoading: false, autoClose: 3000,
                 hideProgressBar: false
@@ -106,7 +108,10 @@ const Dashboard = () => {
                                 setBillings={setBillings}
                                 refetch={refetch}
                                 bill={selectedBill}
-                                setBill={setSelectedBill} />
+                                setBill={setSelectedBill}
+                                updateAll={updateAll}
+                                
+                                />
 
                         </label>
                     </label>

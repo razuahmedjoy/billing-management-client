@@ -7,14 +7,14 @@ import Header from './Header';
 export const billingContext = createContext('billings')
 export const userContext = createContext('user')
 const Layout = () => {
-    const { allBillings, billings, setBillings, loading, refetch, page, setPage, totalPage } = useBillings()
-
     const { user, setUser, loading: userLoading, setLoading } = useAuth()
+    const { allBillings, billings, setBillings, loading, refetch, page, setPage, totalPage ,updateAll} = useBillings(user)
+
 
     return (
 
         <div>
-            <billingContext.Provider value={{ allBillings, billings, setBillings, loading, refetch, page, setPage, totalPage }}>
+            <billingContext.Provider value={{ allBillings, billings, setBillings, loading, refetch, page, setPage, totalPage, updateAll }}>
                 <userContext.Provider value={{ user, setUser, userLoading, setLoading }}>
 
                     <Header />

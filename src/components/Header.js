@@ -7,12 +7,18 @@ const Header = () => {
     const { user, userLoading } = useContext(userContext)
     const { allBillings, billings, setBillings, loading, refetch } = useContext(billingContext)
     // console.log(user, userLoading);
-    if(userLoading){
+    if (userLoading || !allBillings || !billings) {
         return;
     }
 
-    const getTotal = (prev, current) => {
-        return prev + parseInt(current.amount)
+    const getTotal = () => {
+        if (allBillings) {
+            let total = 0;
+            for(let bill of allBillings) {
+                total += parseInt(bill.amount);
+            }
+            return total;
+        }
     }
 
     return (
@@ -27,8 +33,8 @@ const Header = () => {
                             user ?
                                 <li>
                                     <button className="py-1 px-3 rounded-full bg-primary text-white">Paid Total :
-                                        {
-                                            allBillings?.reduce(getTotal, 0)
+                                        $ {
+                                            getTotal()
                                         }
                                     </button>
 

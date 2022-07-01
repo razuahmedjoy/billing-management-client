@@ -3,7 +3,7 @@ import { useQuery } from 'react-query';
 import { userContext } from '../components/Layout';
 import useAuth from './useAuth';
 
-const useBillings = () => {
+const useBillings = (user) => {
 
     const [allBillings, setAllBillings] = useState([]);
     const [billings, setBillings] = useState([]);
@@ -21,24 +21,39 @@ const useBillings = () => {
     //     return data;
 
     // })
+    const getBillings = async () => {
+        setLoading(true);
+        const url = `${process.env.REACT_APP_API_URL}/billing-list`
+        // console.log(url)
+
+        const res = await fetch(url);
+        const data = await res.json();
+        setBillings(data);
+        setAllBillings(data)
+        setTotalPage(Math.ceil(data.length / 10))
+        setLoading(false);
+    }
 
     useEffect(() => {
-        const getBillings = async () => {
-            setLoading(true);
-            const url = `${process.env.REACT_APP_API_URL}/billing-list`
-            // console.log(url)
 
-            const res = await fetch(url);
-            const data = await res.json();
-            setBillings(data);
-            setAllBillings(data)
-            setTotalPage(Math.ceil(data.length / 10))
-            setLoading(false);
+        if (user) {
+
+            getBillings();
         }
+    }, [user])
 
-        getBillings();
-    }, [])
+    const updateAll = async () => {
+        setLoading(true);
+        const url = `${process.env.REACT_APP_API_URL}/billing-list`
+        // console.log(url)
 
+        const res = await fetch(url);
+        const data = await res.json();
+
+        setAllBillings(data)
+        setLoading(false);
+
+    }
     const refetch = async () => {
         setLoading(true);
         let url;
@@ -53,11 +68,11 @@ const useBillings = () => {
 
         const res = await fetch(url);
         const data = await res.json();
-        setBillings(data);
-        setAllBillings(data)
+        setBillings(data)
         setLoading(false);
     }
-    return { allBillings, billings, setBillings, loading, refetch, page, setPage, totalPage }
+
+    return { allBillings, billings, setBillings, loading, refetch, page, setPage, totalPage, updateAll }
 }
 
 export default useBillings;
